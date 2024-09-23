@@ -1,16 +1,16 @@
-# Retail Sales Analysis SQL Project
+# pizza Sales Analysis SQL Project
 
 ## Project Overview
 
-**Project Title**: Retail Sales Analysis  
-**Level**: Beginner  
-**Database**: `p1_retail_db`
+**Project Title**: pizza sales analysis  
+**Level**: intermediate 
+**Database**: `papajohns`
 
-This project is designed to demonstrate SQL skills and techniques typically used by data analysts to explore, clean, and analyze retail sales data. The project involves setting up a retail sales database, performing exploratory data analysis (EDA), and answering specific business questions through SQL queries. This project is ideal for those who are starting their journey in data analysis and want to build a solid foundation in SQL.
+This project is designed to demonstrate SQL skills and techniques typically used by data analysts to explore, clean, and analyze pizza sales data. The project involves setting up a pizza sales database, performing exploratory data analysis (EDA), and answering specific business questions through SQL queries. This project is ideal for those who are starting their journey in data analysis and want to build a solid foundation in SQL.
 
 ## Objectives
 
-1. **Set up a retail sales database**: Create and populate a retail sales database with the provided sales data.
+1. **Set up a pizza sales database**: Create and populate a pizza sales database with the provided sales data.
 2. **Data Cleaning**: Identify and remove any records with missing or null values.
 3. **Exploratory Data Analysis (EDA)**: Perform basic exploratory data analysis to understand the dataset.
 4. **Business Analysis**: Use SQL to answer specific business questions and derive insights from the sales data.
@@ -19,209 +19,288 @@ This project is designed to demonstrate SQL skills and techniques typically used
 
 ### 1. Database Setup
 
-- **Database Creation**: The project starts by creating a database named `p1_retail_db`.
-- **Table Creation**: A table named `retail_sales` is created to store the sales data. The table structure includes columns for transaction ID, sale date, sale time, customer ID, gender, age, product category, quantity sold, price per unit, cost of goods sold (COGS), and total sale amount.
+- **Database Creation**: The project starts by creating a database named `papajohns`.
+- 
+- **Table Creations**: There are four csv data have given- pizza_types,pizzas,orders,order_details.So we created  four tables with names `pizza_types`,`pizzas`,`orders`,`order_details` to store the needed data. The `pizza_types` table structure includes columns for pizza_type_id ,name,category,incredients.The `pizzas` table struicture include columns for pizza_id,pizza_type_id,size,price. The `orders` table structure include columns for order_id,date,time. The `order_details`table structure include columns for order_details_id,order_id,pizza_id,quantity.
+
 
 ```sql
-CREATE DATABASE p1_retail_db;
+CREATE DATABASE papajohns;
 
-CREATE TABLE retail_sales
+CREATE TABLE pizza_types
 (
-    transactions_id INT PRIMARY KEY,
-    sale_date DATE,	
-    sale_time TIME,
-    customer_id INT,	
-    gender VARCHAR(10),
-    age INT,
-    category VARCHAR(35),
-    quantity INT,
-    price_per_unit FLOAT,	
-    cogs FLOAT,
-    total_sale FLOAT
+  pizza_type_id varchar(20),
+name varchar(70),
+category varchar(20),
+incredients varchar(200)
+);
+```
+```sql
+CREATE TABLE pizzas
+(
+  pizza_id varchar(20),
+pizza_type_id varchar(20),
+size varchar(2),
+price float(10)
+);
+```
+```sql
+
+CREATE TABLE order-details
+(
+  order_details_id int,
+order_id int,
+pizza_id varchar(20),
+quantity int
+);
+```
+```sql
+
+CREATE TABLE orders
+(
+  order_id int,
+date date,
+time time,
 );
 ```
 
+
+
 ### 2. Data Exploration & Cleaning
 
-- **Record Count**: Determine the total number of records in the dataset.
+- **Record Count**: Determine the total number of records in all the dataset.
 - **Customer Count**: Find out how many unique customers are in the dataset.
 - **Category Count**: Identify all unique product categories in the dataset.
 - **Null Value Check**: Check for any null values in the dataset and delete records with missing data.
 
 ```sql
-SELECT COUNT(*) FROM retail_sales;
-SELECT COUNT(DISTINCT customer_id) FROM retail_sales;
-SELECT DISTINCT category FROM retail_sales;
+SELECT COUNT(*) FROM pizza_types;
+SELECT COUNT(*) FROM pizzas;
+SELECT COUNT(*) FROM orders;
+SELECT COUNT(*) FROM order_details;
 
-SELECT * FROM retail_sales
+SELECT * FROM pizza_types
 WHERE 
-    sale_date IS NULL OR sale_time IS NULL OR customer_id IS NULL OR 
-    gender IS NULL OR age IS NULL OR category IS NULL OR 
-    quantity IS NULL OR price_per_unit IS NULL OR cogs IS NULL;
+    pizza_type_id IS NULL OR name IS NULL OR category IS NULL OR 
+    incredients IS NULL;
 
-DELETE FROM retail_sales
+DELETE FROM pizza_types
 WHERE 
-    sale_date IS NULL OR sale_time IS NULL OR customer_id IS NULL OR 
-    gender IS NULL OR age IS NULL OR category IS NULL OR 
-    quantity IS NULL OR price_per_unit IS NULL OR cogs IS NULL;
+   pizza_type_id IS NULL OR name IS NULL OR category IS NULL OR 
+    incredients IS NULL;
+
+SELECT * FROM pizzas
+WHERE 
+    pizza_type_id IS NULL OR pizza_id IS NULL OR price IS NULL OR 
+    size IS NULL;
+
+DELETE FROM pizzas
+WHERE 
+    pizza_type_id IS NULL OR pizza_id IS NULL OR price IS NULL OR 
+    size IS NULL;
+
+SELECT * FROM orders
+WHERE 
+    order_id IS NULL OR date IS NULL OR time IS NULL;
+  
+
+DELETE FROM pizzas
+WHERE 
+  order_id IS NULL OR date IS NULL OR time IS NULL;
+
+SELECT * FROM order_details
+WHERE 
+    order_details_id IS NULL OR pizza_id IS NULL OR order_id IS NULL OR 
+    quantity IS NULL;
+
+DELETE FROM pizzas
+WHERE 
+   order_details_id IS NULL OR pizza_id IS NULL OR order_id IS NULL OR 
+    quantity IS NULL;
+
 ```
 
 ### 3. Data Analysis & Findings
 
 The following SQL queries were developed to answer specific business questions:
 
-1. **Write a SQL query to retrieve all columns for sales made on '2022-11-05**:
+1. **Retrieve the total number of orders placed.**:
 ```sql
-SELECT *
-FROM retail_sales
-WHERE sale_date = '2022-11-05';
+
+SELECT 
+    COUNT(ORDER_ID) AS TOTAL_NO_OF_ORDER_PLACED
+FROM
+    ORDERS;
+    
 ```
 
-2. **Write a SQL query to retrieve all transactions where the category is 'Clothing' and the quantity sold is more than 4 in the month of Nov-2022**:
+2. **Calculate the total revenue generated from pizza sales**:
 ```sql
 SELECT 
-  *
-FROM retail_sales
-WHERE 
-    category = 'Clothing'
-    AND 
-    TO_CHAR(sale_date, 'YYYY-MM') = '2022-11'
-    AND
-    quantity >= 4
+    ROUND(SUM(PIZZAS.PRICE * ORDERDETAILS.QUANTITY),
+            2) AS TOTAL_N0_REVENUE_GENERATED
+FROM
+    PIZZAS
+        JOIN
+    ORDERDETAILS ON PIZZAS.PIZZA_ID = ORDERDETAILS.PIZZA_ID;
 ```
 
-3. **Write a SQL query to calculate the total sales (total_sale) for each category.**:
+3. **Identify the highest-priced pizza**:
 ```sql
 SELECT 
-    category,
-    SUM(total_sale) as net_sale,
-    COUNT(*) as total_orders
-FROM retail_sales
-GROUP BY 1
+    PIZZATYPES.NAME, PIZZAS.PRICE
+FROM
+    PIZZATYPES
+        JOIN
+    PIZZAS ON PIZZATYPES.PIZZA_TYPE_ID = PIZZAS.PIZZA_TYPE_ID
+ORDER BY PIZZAS.PRICE DESC
+LIMIT 1;
+
 ```
 
-4. **Write a SQL query to find the average age of customers who purchased items from the 'Beauty' category.**:
-```sql
-SELECT
-    ROUND(AVG(age), 2) as avg_age
-FROM retail_sales
-WHERE category = 'Beauty'
-```
-
-5. **Write a SQL query to find all transactions where the total_sale is greater than 1000.**:
-```sql
-SELECT * FROM retail_sales
-WHERE total_sale > 1000
-```
-
-6. **Write a SQL query to find the total number of transactions (transaction_id) made by each gender in each category.**:
+4. ** Identify the most common pizza size ordered..**:
 ```sql
 SELECT 
-    category,
-    gender,
-    COUNT(*) as total_trans
-FROM retail_sales
-GROUP 
-    BY 
-    category,
-    gender
-ORDER BY 1
+    PIZZAS.SIZE, COUNT(ORDERDETAILS.QUANTITY) AS TOTAL_QUANTITY
+FROM
+    PIZZAS
+        JOIN
+    ORDERDETAILS ON PIZZAS.PIZZA_ID = ORDERDETAILS.PIZZA_ID
+GROUP BY PIZZAS.SIZE
+ORDER BY TOTAL_QUANTITY DESC
+LIMIT 1;
 ```
 
-7. **Write a SQL query to calculate the average sale for each month. Find out best selling month in each year**:
+5. **List the top 5 most ordered pizza types along with their quantities.
+.**:
 ```sql
 SELECT 
-       year,
-       month,
-    avg_sale
-FROM 
-(    
-SELECT 
-    EXTRACT(YEAR FROM sale_date) as year,
-    EXTRACT(MONTH FROM sale_date) as month,
-    AVG(total_sale) as avg_sale,
-    RANK() OVER(PARTITION BY EXTRACT(YEAR FROM sale_date) ORDER BY AVG(total_sale) DESC) as rank
-FROM retail_sales
-GROUP BY 1, 2
-) as t1
-WHERE rank = 1
+    (PIZZAS.PIZZA_TYPE_ID) AS PIZZA_TYPES,
+    SUM(ORDERDETAILS.QUANTITY) AS QUANTITY
+FROM
+    PIZZAS
+        JOIN
+    orderdetails ON PIZZAS.PIZZA_ID = ORDERDETAILS.PIZZA_ID
+GROUP BY PIZZAS.PIZZA_TYPE_ID
+ORDER BY QUANTITY DESC
+LIMIT 5;
 ```
 
-8. **Write a SQL query to find the top 5 customers based on the highest total sales **:
+6. **Join the necessary tables to find the total quantity of each pizza category ordered..**:
 ```sql
 SELECT 
-    customer_id,
-    SUM(total_sale) as total_sales
-FROM retail_sales
-GROUP BY 1
-ORDER BY 2 DESC
-LIMIT 5
+    (PIZZATYPES.CATEGORY) AS PIZZA_CATEGORY,
+    SUM(ORDERDETAILS.QUANTITY) AS QUANTITY
+FROM
+    PIZZATYPES
+        JOIN
+    PIZZAS ON PIZZATYPES.PIZZA_TYPE_ID = PIZZAS.PIZZA_TYPE_ID
+        JOIN
+    ORDERDETAILS ON ORDERDETAILS.PIZZA_ID = PIZZAS.PIZZA_ID
+GROUP BY PIZZA_CATEGORY
+ORDER BY QUANTITY DESC;
 ```
 
-9. **Write a SQL query to find the number of unique customers who purchased items from each category.**:
+7. **Determine the distribution of orders by hour of the day.**:
 ```sql
 SELECT 
-    category,    
-    COUNT(DISTINCT customer_id) as cnt_unique_cs
-FROM retail_sales
-GROUP BY category
+    HOUR(ORDER_TIME) AS HOUR, COUNT(ORDER_ID) AS TOATL_ORDERS
+FROM
+    ORDERS
+GROUP BY HOUR
+ORDER BY HOUR ASC;
+
 ```
 
-10. **Write a SQL query to create each shift and number of orders (Example Morning <12, Afternoon Between 12 & 17, Evening >17)**:
+8. **Join relevant tables to find the category-wise distribution of pizzas. **:
 ```sql
-WITH hourly_sale
-AS
-(
-SELECT *,
-    CASE
-        WHEN EXTRACT(HOUR FROM sale_time) < 12 THEN 'Morning'
-        WHEN EXTRACT(HOUR FROM sale_time) BETWEEN 12 AND 17 THEN 'Afternoon'
-        ELSE 'Evening'
-    END as shift
-FROM retail_sales
-)
 SELECT 
-    shift,
-    COUNT(*) as total_orders    
-FROM hourly_sale
-GROUP BY shift
+    CATEGORY, COUNT(NAME) AS DISTRIBUTION
+FROM
+    PIZZATYPES
+GROUP BY CATEGORY;
+
 ```
 
+9. **Group the orders by date and calculate the average number of pizzas ordered per day..**:
+```sql
+SELECT 
+    ROUND(AVG(ORDER_QUANTITY), 0) AS AVERAGE_ORDERS
+FROM
+    (SELECT 
+        (ORDERS.ORDER_DATE) AS DATE,
+            SUM(ORDERDETAILS.QUANTITY) AS ORDER_QUANTITY
+    FROM
+        ORDERS
+    JOIN ORDERDETAILS ON ORDERS.ORDER_ID = orderdetails.ORDER_ID
+    GROUP BY DATE) AS TOTAL_ORDER_QUANTITY;
+    
+```
+
+10. **Determine the top 3 most ordered pizza types based on revenue.**:
+```sql
+SELECT 
+    (PIZZATYPES.NAME) AS PIZZA_NAME,
+    ROUND(SUM((PIZZAS.PRICE) * (orderdetails.QUANTITY)),
+            2) AS REVENUE
+FROM
+    PIZZATYPES
+        JOIN
+    PIZZAS ON PIZZATYPES.PIZZA_TYPE_ID = PIZZAS.PIZZA_TYPE_ID
+        JOIN
+    orderdetails ON PIZZAS.PIZZA_ID = ORDERDETAILS.PIZZA_ID
+GROUP BY PIZZA_NAME
+ORDER BY REVENUE DESC
+LIMIT 3;
+```
+10. **Calculate the percentage contribution of each pizza type to total revenue.**:
+```sql
+SELECT (PIZZAS.PIZZA_TYPE_ID) AS PIZZA_TYPE,ROUND((SUM((PIZZAS.PRICE)*(orderdetails.QUANTITY))/(SELECT 
+    ROUND(SUM(PIZZAS.PRICE * ORDERDETAILS.QUANTITY),
+            2) AS TOTAL_N0_REVENUE_GENERATED
+FROM
+    PIZZAS
+        JOIN
+    ORDERDETAILS ON PIZZAS.PIZZA_ID = ORDERDETAILS.PIZZA_ID))*100,2) AS PERCENTAGE_CONTRI
+    FROM PIZZAS JOIN ORDERDETAILS
+    ON PIZZAS.PIZZA_ID=orderdetails.PIZZA_ID
+    GROUP BY PIZZA_TYPE;
+```
+10. **Analyze the cumulative revenue generated over time.**:
+```sql
+SELECT ORDER_DATE , SUM(REVENUE) OVER (ORDER BY ORDER_DATE) AS CUM_REVENUE FROM
+(SELECT (ORDERS.ORDER_DATE) AS ORDER_DATE,ROUND(SUM((ORDERDETAILS.QUANTITY)*(PIZZAS.PRICE)),3)AS REVENUE
+FROM ORDERS JOIN ORDERDETAILS
+ON ORDERS.ORDER_ID=ORDERDETAILS.ORDER_ID
+JOIN PIZZAS
+ON PIZZAS.PIZZA_ID=ORDERDETAILS.PIZZA_ID
+GROUP BY ORDER_DATE ) AS SALES;
+```
+10. **Determine the top 3 most ordered pizza types based on revenue for each pizza category.**:
+```sql
+SELECT CATEGORY , NAME,REVENUE, 
+RANK() OVER (PARTITION BY CATEGORY ORDER BY NAME DESC) AS RNK FROM
+(SELECT PIZZATYPES.CATEGORY,PIZZATYPES.NAME,ROUND(SUM((ORDERDETAILS.QUANTITY)*(PIZZAS.PRICE)),2) AS REVENUE
+FROM PIZZATYPES JOIN PIZZAS
+ON PIZZATYPES.PIZZA_TYPE_ID=PIZZAS.PIZZA_TYPE_ID
+JOIN ORDERDETAILS
+ON ORDERDETAILS.PIZZA_ID=PIZZAS.PIZZA_ID
+GROUP BY PIZZATYPES.CATEGORY,PIZZATYPES.NAME) AS A;
+```
 ## Findings
 
-- **Customer Demographics**: The dataset includes customers from various age groups, with sales distributed across different categories such as Clothing and Beauty.
-- **High-Value Transactions**: Several transactions had a total sale amount greater than 1000, indicating premium purchases.
-- **Sales Trends**: Monthly analysis shows variations in sales, helping identify peak seasons.
-- **Customer Insights**: The analysis identifies the top-spending customers and the most popular product categories.
+- **Customer Demographics**: The dataset includes customers from various taste groups, with sales distributed across different categories such as chicken and veg etc.
+- **Revenue **: Monthly analysis shows variations in sales, helping identify peak seasons.
+- **Customer Insights**: The analysis identifies the top-spending customers and the most popular pizza categories.
 
 ## Reports
 
 - **Sales Summary**: A detailed report summarizing total sales, customer demographics, and category performance.
-- **Trend Analysis**: Insights into sales trends across different months and shifts.
+- **Trend Analysis**: Insights into sales trends across different date and shifts.
 - **Customer Insights**: Reports on top customers and unique customer counts per category.
 
 ## Conclusion
 
 This project serves as a comprehensive introduction to SQL for data analysts, covering database setup, data cleaning, exploratory data analysis, and business-driven SQL queries. The findings from this project can help drive business decisions by understanding sales patterns, customer behavior, and product performance.
 
-## How to Use
 
-1. **Clone the Repository**: Clone this project repository from GitHub.
-2. **Set Up the Database**: Run the SQL scripts provided in the `database_setup.sql` file to create and populate the database.
-3. **Run the Queries**: Use the SQL queries provided in the `analysis_queries.sql` file to perform your analysis.
-4. **Explore and Modify**: Feel free to modify the queries to explore different aspects of the dataset or answer additional business questions.
-
-## Author - Zero Analyst
-
-This project is part of my portfolio, showcasing the SQL skills essential for data analyst roles. If you have any questions, feedback, or would like to collaborate, feel free to get in touch!
-
-### Stay Updated and Join the Community
-
-For more content on SQL, data analysis, and other data-related topics, make sure to follow me on social media and join our community:
-
-- **YouTube**: [Subscribe to my channel for tutorials and insights](https://www.youtube.com/@zero_analyst)
-- **Instagram**: [Follow me for daily tips and updates](https://www.instagram.com/zero_analyst/)
-- **LinkedIn**: [Connect with me professionally](https://www.linkedin.com/in/najirr)
-- **Discord**: [Join our community to learn and grow together](https://discord.gg/36h5f2Z5PK)
-
-Thank you for your support, and I look forward to connecting with you!
